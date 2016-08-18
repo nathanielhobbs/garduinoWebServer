@@ -1,19 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-   <meta charset="UTF-8">
-   <title>Plant Monitor</title>
-</head>
-<body>
-   <h1>Welcome to Nathaniel's Plant Montoring Webpage!</h1>
-   <form action="/plants" method="POST">
-      <input type="text" placeholder="name" name="name">
-      <button type="submit">Submit</button>
-   </form>
-   <form action="/light" method="POST">
-      <input type="text" placeholder="status" name="status">
-      <button type="submit">Submit</button>
-   </form>
-</body>
-</body>
+   <head>
+      <meta charset="UTF-8">
+      <title>Plant Monitor</title>
+      <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.0.min.js"></script>
+   </head>
+   <body>
+      <h1>Welcome to Nathaniel's Plant Montoring Webpage!</h1>
+
+      <h3>Garden as of <span id="lastReadTime"></span></h3>
+      <div id="garden"></div>
+      <script type="text/javascript">
+         $(document).ready(function () {
+            'use strict';
+            var updateTime = 1000;    // garden refresh time (in ms)
+            var gardenInfo;
+
+            window.setInterval(function () {
+               var currentTime = new Date();
+               $("#lastReadTime").text(currentTime);
+
+               $.get('http://127.0.0.1:6127/garden', function(data, status){
+                  var gardenHtml = '';
+
+                  for(var o in data){
+                     var plantName = JSON.stringify(o).replace(/\"/g, '');
+                     var plant = data[o];
+                     var moisture = JSON.stringify(plant.moisture).replace(/\"/g, '');
+                     var timeDiff = currentTime - new Date(plant.lastUpdate);
+
+                     timeDiff /= 1000;
+                     var seconds = Math.floor(timeDiff % 60);
+                     timeDiff /= 60;
+                     var minutes = Math.floor(timeDiff % 60);
+                     timeDiff /= 60;
+                     var hours = Math.floor(timeDiff % 24);
+                     timeDiff /= 24;
+                     var days = Math.floor(timeDiff);
+
+                     var htmlTimeDiff = '';
+                     if(days > 0){
+                        htmlTimeDiff += days + " days, ";
+                     }
+                     if(hours > 0){
+                        htmlTimeDiff += hours+ " hours, ";
+                     }
+                     if(minutes > 0){
+                        htmlTimeDiff += minutes + " minutes, "
+                     }
+                     htmlTimeDiff += seconds + " seconds"
+
+                     gardenHtml += '<text style="font-size:150%">'+plantName+'</text> : ';
+                     gardenHtml += '<text style="color:#0033cc; font-weight=bold">' + moisture+'</text> ('+htmlTimeDiff+' ago)';
+                  }
+                  $('#garden').html(gardenHtml);
+               })
+            }, updateTime);
+         });
+      </script>
+
+      <!--
+      <form action="/plants" method="POST">
+         <input type="text" placeholder="name" name="name">
+         <button type="submit">Submit</button>
+      </form>
+      -->
+
+   </body>
 </html>
