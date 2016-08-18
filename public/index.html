@@ -75,7 +75,11 @@
                      if(minutes > 0){
                         htmlTimeDiff += minutes + " minutes, "
                      }
-                     htmlTimeDiff += seconds + " seconds"
+                     if(seconds >= 0){
+                        htmlTimeDiff += seconds + " seconds"
+                     } 
+                     else
+                        htmlTimeDiff += 0 + " seconds"
 
                      gardenHtml += '<text style="font-size:150%">'+plantName+'</text> : ';
                      gardenHtml += '<text style="color:#0033cc; font-weight=bold">' + moisture+'</text> ('+htmlTimeDiff+' ago)';
