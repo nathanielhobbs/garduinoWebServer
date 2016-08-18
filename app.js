@@ -38,7 +38,8 @@ app.post('/garden', function(req,res) {
 
   //because working with objects, don't need to check for existance of plant in garden
   //if new then this will add to garden, otherwise will update whatever properties changed
-  garden[plant.name] = plant;  
+  var key = lant.name.split(' ', 1)[0]; //first word of plant for key
+  garden[key] = plant;  
 
   res.send(garden);
 });

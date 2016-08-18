@@ -50,8 +50,8 @@
                   var plantCounter = 0;
 
                   for(var o in data){
-                     var plantName = JSON.stringify(o).replace(/\"/g, '');
                      var plant = data[o];
+                     var plantName = JSON.stringify(plant.name).replace(/\"/g, '');
                      var moisture = JSON.stringify(plant.moisture).replace(/\"/g, '');
                      var timeDiff = currentTime - new Date(plant.lastUpdate);
                      plantCounter++;
