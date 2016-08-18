@@ -39,7 +39,6 @@ app.post('/garden', function(req,res) {
   //because working with objects, don't need to check for existance of plant in garden
   //if new then this will add to garden, otherwise will update whatever properties changed
   garden[plant.name] = plant;  
-  console.log('garden is now '+JSON.stringify(garden));
 
   res.send(garden);
 });
