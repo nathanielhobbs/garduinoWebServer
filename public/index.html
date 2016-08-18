@@ -1,14 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
    <head>
-      <meta charset="UTF-8">
       <title>Plant Monitor</title>
-      <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.0.min.js"></script>
+
+      <!-- Required meta tags always come first -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" integrity="sha384-MIwDKRSSImVFAZCVLtU0LMDdON6KVCrZHyVQQj6e8wIEJkW4tvwqXrbMIya1vriY" crossorigin="anonymous">
+
+      <!-- jQuery first, then Tether, then Bootstrap JS. -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js" integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD" crossorigin="anonymous"></script>
    </head>
    <body>
+      <br>
       <h1>Welcome to Nathaniel's Plant Montoring Webpage!</h1>
 
+      <br><br><br>
       <h3>Garden as of <span id="lastReadTime"></span></h3>
+      <table class="table table-bordered table-hover" id="garden-table">
+        <thead class="bg-success">
+          <tr>
+            <th>#</th>
+            <th>Plant Name</th>
+            <th>Moisture Level</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
       <div id="garden"></div>
       <script type="text/javascript">
          $(document).ready(function () {
@@ -22,12 +47,14 @@
 
                $.get('http://127.0.0.1:6127/garden', function(data, status){
                   var gardenHtml = '';
+                  var plantCounter = 0;
 
                   for(var o in data){
                      var plantName = JSON.stringify(o).replace(/\"/g, '');
                      var plant = data[o];
                      var moisture = JSON.stringify(plant.moisture).replace(/\"/g, '');
                      var timeDiff = currentTime - new Date(plant.lastUpdate);
+                     plantCounter++;
 
                      timeDiff /= 1000;
                      var seconds = Math.floor(timeDiff % 60);
@@ -52,8 +79,31 @@
 
                      gardenHtml += '<text style="font-size:150%">'+plantName+'</text> : ';
                      gardenHtml += '<text style="color:#0033cc; font-weight=bold">' + moisture+'</text> ('+htmlTimeDiff+' ago)';
+
+
+                     // if plant is new, add a new row to the table
+                     // else update corresponding values
+                     if($('table:not(:has(#'+plantName+'))').length > 0){
+                        $('table').find('tbody')
+                        .append($('<tr>')
+                           .attr('id',plantName)
+                           .append($('<th>')
+                              .attr('scope','row')
+                              .html(plantCounter))
+                           .append($('<td>')
+                              .html(plantName))
+                           .append($('<td>')
+                              .html(moisture))
+                           .append($('<td>')
+                              .html(htmlTimeDiff)));
+                     }
+                     else{
+                        $('#'+plantName+' td').eq(1).html(moisture); //update moisture in table
+                        $('#'+plantName+' td').eq(2).html(htmlTimeDiff); //update last time updated in table
+                     }
                   }
-                  $('#garden').html(gardenHtml);
+
+                  //$('#garden').html(gardenHtml);
                })
             }, updateTime);
          });
@@ -65,6 +115,5 @@
          <button type="submit">Submit</button>
       </form>
       -->
-
    </body>
 </html>
