@@ -23,7 +23,7 @@
       <br><br><br>
       <h3>Garden as of <span id="lastReadTime"></span></h3>
       <table class="table table-bordered table-hover" id="garden-table">
-        <thead class="bg-success">
+        <thead class="thead-inverse">
           <tr>
             <th>#</th>
             <th>Plant Name</th>
@@ -100,6 +100,35 @@
                      else{
                         $('#'+plantName+' td').eq(1).html(moisture); //update moisture in table
                         $('#'+plantName+' td').eq(2).html(htmlTimeDiff); //update last time updated in table
+                     }
+
+                     // change background colors of moisture entries depending on values
+                     if(moisture > 800){
+                        $('#'+plantName+' td').eq(1).attr('class', 'bg-danger');
+                     }
+                     else if(moisture > 600 && moisture <= 800){
+                        $('#'+plantName+' td').eq(1).attr('class', 'bg-warning');
+                     }
+                     else if(moisture > 400 && moisture <= 600){
+                        $('#'+plantName+' td').eq(1).attr('style', 'background-color:#339933');
+                     }
+                     else if(moisture > 230 && moisture <= 400){
+                        $('#'+plantName+' td').eq(1).attr('style', 'background-color:#00cc00');
+                     }
+                     else if(moisture > 175 && moisture <= 230){
+                        $('#'+plantName+' td').eq(1).attr('style', 'background-color:#ccffdd');
+                     }
+                     else{
+                        $('#'+plantName+' td').eq(1).attr('style', 'background-color:#0066cc');
+                        // $('#'+plantName+' td').eq(1).attr('style', {backgroundColor:"#1a0066"});
+                     }
+
+                     //change background colors of last time update depending on values
+                     if(days > 0){
+                        $('#'+plantName+' td').eq(2).attr('class', 'bg-danger');
+                     }
+                     if(hours > 0){
+                        $('#'+plantName+' td').eq(2).attr('class', 'bg-warning');
                      }
                   }
 
