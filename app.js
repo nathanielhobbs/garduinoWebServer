@@ -41,6 +41,8 @@ app.post('/garden', function(req,res) {
   var key = plant.name.split(' ', 1)[0]; //first word of plant for key
   garden[key] = plant;  
 
+  console.log("garden is now ", JSON.stringify(garden))
+
   res.send(garden);
 });
 
