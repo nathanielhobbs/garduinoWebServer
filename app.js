@@ -65,9 +65,18 @@ app.get('/garden', function (req, res) {
 
 // CREATE SERVER
 app.listen(port, function(){
- console.log('Server started, listening on port: ',port);
- loadGardenFromFile();
- console.log('garden from file is ', garden);
+  console.log('Server started, listening on port: ',port);
+  fs.stat('garden.js', function(err, stat) {
+    if(err == null) {
+        loadGardenFromFile();
+    } else if(err.code == 'ENOENT') {
+        // file does not exist
+        fs.writeFile('garden.js', JSON.toString('{}'));
+          } else {
+              console.log('Some other error: ', err.code);
+          }
+  });
+  console.log('garden from file is ', garden);
 });
 
 function loadGardenFromFile(){
