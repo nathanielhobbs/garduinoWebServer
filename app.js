@@ -1,7 +1,8 @@
-"use strict"
+ "use strict"
 
 var express = require('express');
 var app = express();
+var fs = require('fs');
 var settings = require('./settings');
 var port = settings.port;
 var garden = {};
@@ -36,11 +37,19 @@ app.post('/garden', function(req,res) {
   //because working with objects, don't need to check for existance of plant in garden
   //if new then this will add to garden, otherwise will update whatever properties changed
   var key = plant.mac.replace(/:/g, ''); //use mac address (sub colons) as unique key
-  garden[key] = plant;  
 
-  console.log("garden is now ", JSON.stringify(garden))
-
-  res.send(garden);
+  if(!garden.hasOwnProperty(key) || (plant.name && plant.name !== garden[key].name)){
+    console.log('saving to file')
+    garden[key] = plant;
+    saveGardenToFile(function(){
+      res.send(garden)
+    });
+  }
+  else{
+    garden[key] = plant;
+    res.send(garden);
+  }
+  
 });
 
 app.get('/', function(req,res){
@@ -57,8 +66,28 @@ app.get('/garden', function (req, res) {
 // CREATE SERVER
 app.listen(port, function(){
  console.log('Server started, listening on port: ',port);
+ loadGardenFromFile();
+ console.log('garden from file is ', garden);
 });
 
+function loadGardenFromFile(){
+  fs.readFile('garden.js', 'utf8', function (err, data) {
+  if (err) 
+    return console.log('Error saving file', err);
+
+  var garden = JSON.parse(data);
+  console.log('garden loaded! ', garden)
+});
+  garden = JSON.parse(fs.readFileSync('garden.js'));
+}
+
+function saveGardenToFile(callback){
+  fs.writeFile('garden.js', JSON.stringify(garden), function (err) {
+    if (err) return console.log('Error saving file', err);
+    console.log('File written successfully');
+    callback();
+  });
+}
 
 function containsObject(childObj, parentObj){
   var o;

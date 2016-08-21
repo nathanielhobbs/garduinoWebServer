@@ -48,7 +48,7 @@
                   var currentTime = new Date();
                   $("#lastReadTime").text(currentTime);
 
-                  $.get('http://rasperrypi:6127/garden', function(data, status){
+                  $.get('http://raspberrypi.local:6127/garden', function(data, status){
                      var gardenHtml = '';
                      var plantCounter = 0;
 
@@ -56,7 +56,7 @@
                         var plant = data[o];
                         var plantKey = o;
                         var macAddress = JSON.stringify(plant.mac).replace(/\"/g, '');
-                        var moisture = JSON.stringify(plant.moisture).replace(/\"/g, '');
+                        var moisture = plant.moisture? JSON.stringify(plant.moisture).replace(/\"/g, ''): "waiting for reading";
                         var timeDiff = currentTime - new Date(plant.lastUpdate);
                         plantCounter++;
 
@@ -94,9 +94,9 @@
                               .append($('<th>')
                                  .attr('scope','row')
                                  .html(plantCounter))
-                              .append($('<td>')
+                              .append($('<td class="plantName">')
                                  .html('<input type="text" size="25" placeholder="Enter plant name here!">'))
-                              .append($('<td>')
+                              .append($('<td class="macAddress">')
                                  .html(macAddress))
                               .append($('<td>')
                                  .html(moisture))
@@ -147,8 +147,18 @@
             $(document).on('keyup', 'input', function() {
                  if(event.keyCode === 13) {
                      // console.log($(this).val());
+                     var thisGarduinoMac = $(this).closest('tr').find($('.macAddress')).html();
+
                      //replace input field with text that user entered
+                     var plantName = $(this).val();
                      $(this).replaceWith('<span class="editable_text">'+$(this).val()+'</span>');
+
+                     //post to web server to save changes
+                     var data = {mac:thisGarduinoMac, name: plantName}
+                     console.log(data)
+                     $.post( "http://localhost:6127/garden", data, function( response ) {
+                       console.log( response );
+                     });
                   }
             });
 
