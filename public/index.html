@@ -17,137 +17,170 @@
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js" integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD" crossorigin="anonymous"></script>
    </head>
    <body>
-      <br>
-      <h1>Welcome to Nathaniel's Plant Montoring Webpage!</h1>
+      <div class="container>"
+         <br>
+         <h1>Welcome to Nathaniel's Plant Montoring Webpage!</h1>
 
-      <br><br><br>
-      <h3>Garden as of <span id="lastReadTime"></span></h3>
-      <table class="table table-bordered table-hover" id="garden-table">
-        <thead class="thead-inverse">
-          <tr>
-            <th>#</th>
-            <th>Plant Name</th>
-            <th>Moisture Level</th>
-            <th>Last Updated</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-      <div id="garden"></div>
-      <script type="text/javascript">
-         $(document).ready(function () {
-            'use strict';
-            var updateTime = 1000;    // garden refresh time (in ms)
-            var gardenInfo;
+         <br><br><br>
+         <h3>Garden as of <span id="lastReadTime"></span></h3>
+         <table class="table table-bordered table-hover" id="garden-table">
+           <thead class="thead-inverse">
+             <tr>
+               <th>#</th>
+               <th>Plant Name</th>
+               <th>Garduino MAC</th>
+               <th>Moisture Level</th>
+               <th>Last Updated</th>
+             </tr>
+           </thead>
+           <tbody>
+           </tbody>
+         </table>
+         <div id="garden"></div>
+         <script type="text/javascript">
+            $(document).ready(function () {
+               'use strict';
 
-            window.setInterval(function () {
-               var currentTime = new Date();
-               $("#lastReadTime").text(currentTime);
+               var updateTime = 1000;    // garden refresh time (in ms)
+               var gardenInfo;
 
-               $.get('http://raspberrypi.local:6127/garden', function(data, status){
-                  var gardenHtml = '';
-                  var plantCounter = 0;
+               window.setInterval(function () {
+                  var currentTime = new Date();
+                  $("#lastReadTime").text(currentTime);
 
-                  for(var o in data){
-                     var plant = data[o];
-                     var plantKey = o;
-                     var plantName = JSON.stringify(plant.name).replace(/\"/g, '');
-                     var moisture = JSON.stringify(plant.moisture).replace(/\"/g, '');
-                     var timeDiff = currentTime - new Date(plant.lastUpdate);
-                     plantCounter++;
+                  $.get('http://rasperrypi:6127/garden', function(data, status){
+                     var gardenHtml = '';
+                     var plantCounter = 0;
 
-                     timeDiff /= 1000;
-                     var seconds = Math.floor(timeDiff % 60);
-                     timeDiff /= 60;
-                     var minutes = Math.floor(timeDiff % 60);
-                     timeDiff /= 60;
-                     var hours = Math.floor(timeDiff % 24);
-                     timeDiff /= 24;
-                     var days = Math.floor(timeDiff);
+                     for(var o in data){
+                        var plant = data[o];
+                        var plantKey = o;
+                        var macAddress = JSON.stringify(plant.mac).replace(/\"/g, '');
+                        var moisture = JSON.stringify(plant.moisture).replace(/\"/g, '');
+                        var timeDiff = currentTime - new Date(plant.lastUpdate);
+                        plantCounter++;
 
-                     var htmlTimeDiff = '';
-                     if(days > 0){
-                        htmlTimeDiff += days + " days, ";
-                     }
-                     if(hours > 0){
-                        htmlTimeDiff += hours+ " hours, ";
-                     }
-                     if(minutes > 0){
-                        htmlTimeDiff += minutes + " minutes, ";
-                     }
-                     if(seconds >= 0){
-                        htmlTimeDiff += seconds + " seconds";
-                     } 
-                     else
-                        htmlTimeDiff += 0 + " seconds";
+                        timeDiff /= 1000;
+                        var seconds = Math.floor(timeDiff % 60);
+                        timeDiff /= 60;
+                        var minutes = Math.floor(timeDiff % 60);
+                        timeDiff /= 60;
+                        var hours = Math.floor(timeDiff % 24);
+                        timeDiff /= 24;
+                        var days = Math.floor(timeDiff);
 
-                     gardenHtml += '<text style="font-size:150%">'+plantName+'</text> : ';
-                     gardenHtml += '<text style="color:#0033cc; font-weight=bold">' + moisture+'</text> ('+htmlTimeDiff+' ago)';
+                        var htmlTimeDiff = '';
+                        if(days > 0){
+                           htmlTimeDiff += days + " days, ";
+                        }
+                        if(hours > 0){
+                           htmlTimeDiff += hours+ " hours, ";
+                        }
+                        if(minutes > 0){
+                           htmlTimeDiff += minutes + " minutes, ";
+                        }
+                        if(seconds >= 0){ //sometimes rounding causes negative seconds, floor it at 0.
+                           htmlTimeDiff += seconds + " seconds";
+                        } 
+                        else
+                           htmlTimeDiff += 0 + " seconds";
 
+                        // if plant is new, add a new row to the table
+                        // else update corresponding values
+                        if($('table:not(:has(#'+plantKey+'))').length > 0){
+                           $('table').find('tbody')
+                           .append($('<tr>')
+                              .attr('id',plantKey)
+                              .append($('<th>')
+                                 .attr('scope','row')
+                                 .html(plantCounter))
+                              .append($('<td>')
+                                 .html('<input type="text" size="25" placeholder="Enter plant name here!">'))
+                              .append($('<td>')
+                                 .html(macAddress))
+                              .append($('<td>')
+                                 .html(moisture))
+                              .append($('<td>')
+                                 .html(htmlTimeDiff)));
+                        }
+                        else{
+                           $('#'+plantKey+' td').eq(2).html(moisture); //update moisture in table
+                           $('#'+plantKey+' td').eq(3).html(htmlTimeDiff); //update last time updated in table
+                        }
 
-                     // if plant is new, add a new row to the table
-                     // else update corresponding values
-                     if($('table:not(:has(#'+plantKey+'))').length > 0){
-                        $('table').find('tbody')
-                        .append($('<tr>')
-                           .attr('id',plantKey)
-                           .append($('<th>')
-                              .attr('scope','row')
-                              .html(plantCounter))
-                           .append($('<td>')
-                              .html(plantName))
-                           .append($('<td>')
-                              .html(moisture))
-                           .append($('<td>')
-                              .html(htmlTimeDiff)));
-                     }
-                     else{
-                        $('#'+plantKey+' td').eq(1).html(moisture); //update moisture in table
-                        $('#'+plantKey+' td').eq(2).html(htmlTimeDiff); //update last time updated in table
-                     }
+                        // change background colors of moisture entries depending on values
+                        if(moisture > 800){
+                           $('#'+plantKey+' td').eq(2).attr('class', 'bg-danger');
+                        }
+                        else if(moisture > 600 && moisture <= 800){
+                           $('#'+plantKey+' td').eq(2).attr('class', 'bg-warning');
+                        }
+                        else if(moisture > 400 && moisture <= 600){
+                           $('#'+plantKey+' td').eq(2).attr('style', 'background-color:#339933');
+                        }
+                        else if(moisture > 230 && moisture <= 400){
+                           $('#'+plantKey+' td').eq(2).attr('style', 'background-color:#00cc00');
+                        }
+                        else if(moisture > 175 && moisture <= 230){
+                           $('#'+plantKey+' td').eq(2).attr('style', 'background-color:#ccffdd');
+                        }
+                        else{
+                           $('#'+plantKey+' td').eq(2).attr('style', 'background-color:#0066cc');
+                        }
 
-                     // change background colors of moisture entries depending on values
-                     if(moisture > 800){
-                        $('#'+plantKey+' td').eq(1).attr('class', 'bg-danger');
+                        //change background colors of last time update depending on values
+                        if(days > 0){
+                           $('#'+plantKey+' td').eq(2).attr('class', 'bg-danger');
+                        }
+                        if(hours > 0){
+                           $('#'+plantKey+' td').eq(2).attr('class', 'bg-warning');
+                        }
                      }
-                     else if(moisture > 600 && moisture <= 800){
-                        $('#'+plantKey+' td').eq(1).attr('class', 'bg-warning');
-                     }
-                     else if(moisture > 400 && moisture <= 600){
-                        $('#'+plantKey+' td').eq(1).attr('style', 'background-color:#339933');
-                     }
-                     else if(moisture > 230 && moisture <= 400){
-                        $('#'+plantKey+' td').eq(1).attr('style', 'background-color:#00cc00');
-                     }
-                     else if(moisture > 175 && moisture <= 230){
-                        $('#'+plantKey+' td').eq(1).attr('style', 'background-color:#ccffdd');
-                     }
-                     else{
-                        $('#'+plantKey+' td').eq(1).attr('style', 'background-color:#0066cc');
-                        // $('#'+plantKey+' td').eq(1).attr('style', {backgroundColor:"#1a0066"});
-                     }
+                  })
+               }, updateTime);
+               
+            });
+         </script>
 
-                     //change background colors of last time update depending on values
-                     if(days > 0){
-                        $('#'+plantKey+' td').eq(2).attr('class', 'bg-danger');
-                     }
-                     if(hours > 0){
-                        $('#'+plantKey+' td').eq(2).attr('class', 'bg-warning');
-                     }
+         <script>
+            // replace text box with user input after "enter" key is pressed
+            $(document).on('keyup', 'input', function() {
+                 if(event.keyCode === 13) {
+                     // console.log($(this).val());
+                     //replace input field with text that user entered
+                     $(this).replaceWith('<span class="editable_text">'+$(this).val()+'</span>');
                   }
+            });
 
-                  //$('#garden').html(gardenHtml);
-               })
-            }, updateTime);
-         });
-      </script>
+            // on click of editable field, display input text box
+            $(document).on('click', '.editable_text', function() {
+                     $(this).replaceWith('<input type="text" size="25" value="' + $(this).text() +'" >');
+            });
 
-      <!--
-      <form action="/plants" method="POST">
-         <input type="text" placeholder="name" name="name">
-         <button type="submit">Submit</button>
-      </form>
-      -->
+            //  $(document).on('click','input',function() {
+            //      alert("this");
+            // });
+
+            // $( "th" ).on( "click", function() {
+            //    console.log('th clicked!')
+            //   console.log( $( this ).text() );
+            // });
+
+            // $('input').on("keyup", (function(event) {
+            //    console.log('got a key up!')
+            //       if(event.keyCode === 13) { // on enter key press
+            //          // do whatever you want with the value
+            //          console.log($(this).val());
+            //       }
+            //   }));
+         </script>
+
+         <!--
+         <form action="/plants" method="POST">
+            <input type="text" placeholder="name" name="name">
+            <button type="submit">Submit</button>
+         </form>
+         -->
+      </div>
    </body>
 </html>
