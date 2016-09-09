@@ -85,7 +85,12 @@
                         else
                            htmlTimeDiff += 0 + " seconds";
 
-                        var plantName = plant.name ? JSON.stringify(plant.name) : '<input type="text" size="25" placeholder="Enter plant name here!">';
+                        var plantName;
+                        if(plant.name){
+                           plantName = '<span class="editable_text">' + JSON.stringify(plant.name)+ '</span>';
+                        } else {
+                           plantName = '<input type="text" size="25" placeholder="Enter plant name here!">';
+                        }
 
 
                         // if plant is new, add a new row to the table
