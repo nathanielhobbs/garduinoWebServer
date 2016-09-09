@@ -48,7 +48,7 @@
                   var currentTime = new Date();
                   $("#lastReadTime").text(currentTime);
 
-                  $.get('http://localhost:6127/garden', function(data, status){
+                  $.get('http://raspberrypi.local:6127/garden', function(data, status){
                      var gardenHtml = '';
                      var plantCounter = 0;
 
@@ -156,7 +156,7 @@
                      //post to web server to save changes
                      var data = {mac:thisGarduinoMac, name: plantName}
                      console.log(data)
-                     $.post( "http://localhost:6127/garden", data, function( response ) {
+                     $.post( "http://raspberrypi.local:6127/garden", data, function( response ) {
                        console.log( response );
                      });
                   }
