@@ -38,6 +38,9 @@ app.post('/garden', function(req,res) {
   //if new then this will add to garden, otherwise will update whatever properties changed
   var key = plant.mac.replace(/:/g, ''); //use mac address (sub colons) as unique key
 
+  console.log('garden.hasOwnProperty(key)', garden.hasOwnProperty(key))
+  console.log('(plant.name && plant.name !== garden[key].name)',(plant.name && plant.name !== garden[key].name))
+
   if(!garden.hasOwnProperty(key) || (plant.name && plant.name !== garden[key].name)){
     console.log('saving to file')
     garden[key] = plant;
