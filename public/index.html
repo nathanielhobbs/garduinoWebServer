@@ -87,7 +87,7 @@
 
                         var plantName;
                         if(plant.name){
-                           plantName = '<span class="editable_text">' + JSON.stringify(plant.name)+ '</span>';
+                           plantName = '<span class="editable_text">' + JSON.stringify(plant.name).replace(/\"/g, '') + '</span>';
                         } else {
                            plantName = '<input type="text" size="25" placeholder="Enter plant name here!">';
                         }
