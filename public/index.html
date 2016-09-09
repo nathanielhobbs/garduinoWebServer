@@ -85,6 +85,9 @@
                         else
                            htmlTimeDiff += 0 + " seconds";
 
+                        var plantName = plant.name ? JSON.stringify(plant.name) : '<input type="text" size="25" placeholder="Enter plant name here!">';
+
+
                         // if plant is new, add a new row to the table
                         // else update corresponding values
                         if($('table:not(:has(#'+plantKey+'))').length > 0){
@@ -95,7 +98,7 @@
                                  .attr('scope','row')
                                  .html(plantCounter))
                               .append($('<td class="plantName">')
-                                 .html('<input type="text" size="25" placeholder="Enter plant name here!">'))
+                                 .html(plantName))
                               .append($('<td class="macAddress">')
                                  .html(macAddress))
                               .append($('<td>')
