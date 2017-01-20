@@ -54,6 +54,7 @@
                         var plant = data[o];
                         var plantKey = o;
                         var macAddress = JSON.stringify(plant.mac).replace(/\"/g, '');
+                        macAddress = macAddress.replace(/:/g, '&#8203:'); //add non-breaking whitespace before colon for better text wrapping
                         var moisture = plant.moisture? JSON.stringify(plant.moisture).replace(/\"/g, ''): "waiting for reading";
                         var timeDiff = currentTime - new Date(plant.lastUpdate);
                         plantCounter++;
