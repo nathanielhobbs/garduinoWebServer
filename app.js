@@ -32,14 +32,26 @@ app.post('/garden', function(req,res) {
   console.log('received post from plant:');
   console.log(JSON.stringify(req.body));
   var plant = req.body;
+  console.log('plant is', plant)
   plant.lastUpdate = new Date();
 
   //because working with objects, don't need to check for existance of plant in garden
   //if new then this will add to garden, otherwise will update whatever properties changed
-  var key = plant.mac.replace(/:/g, ''); //use mac address (sub colons) as unique key
+  // var key = plant.mac.replace(/:/g, '').trim(); //use mac address (sub colons) as unique key
+  //TODO: make this less hacky, for some reason empty string being inserted otherwise
+  var keyparts = plant.mac.split(':')
+  var key = '';
+  for(var i = 0; i < keyparts.length; i++){
+    if(keyparts[i].length > 1)
+    key += keyparts[i].substring(0,2)
+  }
 
+  // console.log('Key is "'+key+'"', key.toString(), key.length)
+  // console.log('garden is ',garden)
+  // console.log('garden.hasOwnProperty(\'18fe34e51af2\')', garden.hasOwnProperty('18fe34e51af2'))
+  // console.log('key ?== 18fe34e51af2', key.indexOf('18fe34e51af'))
   console.log('garden.hasOwnProperty(key)', garden.hasOwnProperty(key))
-  console.log('(plant.name && plant.name !== garden[key].name)',(plant.name && plant.name !== garden[key].name))
+  // console.log('(plant.name && plant.name !== garden[key].name)',(plant.name && plant.name !== garden[key].name))
 
   if(!garden.hasOwnProperty(key) || (plant.name && plant.name !== garden[key].name)){
     console.log('saving to file')
@@ -69,12 +81,12 @@ app.get('/garden', function (req, res) {
 // CREATE SERVER
 app.listen(port, function(){
   console.log('Server started, listening on port: ',port);
-  fs.stat('garden.js', function(err, stat) {
+  fs.stat('garden.json', function(err, stat) {
     if(err == null) {
         loadGardenFromFile();
     } else if(err.code == 'ENOENT') {
-        // file does not exist
-        fs.writeFile('garden.js', JSON.toString('{}'));
+        // file does not exist, create it
+        fs.writeFile('garden.json', JSON.toString('{}'));
           } else {
               console.log('Some other error: ', err.code);
           }
@@ -83,18 +95,18 @@ app.listen(port, function(){
 });
 
 function loadGardenFromFile(){
-  fs.readFile('garden.js', 'utf8', function (err, data) {
+  fs.readFile('garden.json', 'utf8', function (err, data) {
   if (err) 
     return console.log('Error saving file', err);
 
   var garden = JSON.parse(data);
   console.log('garden loaded! ', garden)
 });
-  garden = JSON.parse(fs.readFileSync('garden.js'));
+  garden = JSON.parse(fs.readFileSync('garden.json'));
 }
 
 function saveGardenToFile(callback){
-  fs.writeFile('garden.js', JSON.stringify(garden), function (err) {
+  fs.writeFile('garden.json', JSON.stringify(garden), function (err) {
     if (err) return console.log('Error saving file', err);
     console.log('File written successfully');
     callback();
