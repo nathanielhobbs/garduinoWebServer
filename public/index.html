@@ -163,7 +163,7 @@
                      //post to web server to save changes
                      var data = {mac:thisGarduinoMac, name: plantName}
                      console.log(data)
-                     $.post( "http://raspberrypi.local:6127/garden", data, function( response ) {
+                     $.post( "http://nathanielhobbs.com/plantMonitor/garden", data, function( response ) {
                        console.log( response );
                      });
                   }
