@@ -68,8 +68,9 @@ app.post('/garden', function(req,res) {
   }// else just update object and don't save
   else{
     for(var prop in plant){
-      if(plant.hasOwnProperty(prop))
+      if(garden[key].hasOwnProperty(prop) && prop !== 'mac'){
          garden[key][prop] = plant[prop]
+      }
     }
     res.send(garden);
   }
