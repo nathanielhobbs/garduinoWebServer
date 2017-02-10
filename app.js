@@ -53,18 +53,26 @@ app.post('/garden', function(req,res) {
   console.log('garden.hasOwnProperty(key)', garden.hasOwnProperty(key))
   // console.log('(plant.name && plant.name !== garden[key].name)',(plant.name && plant.name !== garden[key].name))
 
-  if(!garden.hasOwnProperty(key) || (plant.name && plant.name !== garden[key].name)){
-    console.log('saving to file')
+  // if receiving update from new device, save it to file
+  if(!garden.hasOwnProperty(key)){
     garden[key] = plant;
     saveGardenToFile(function(){
-      res.send(garden)
+       res.send(garden)
     });
-  }
+  }// else if name change, update just name property and save file
+  else if(plant.name && plant.name !== garden[key].name){
+    garden[key].name = plant.name;
+    saveGardenToFile(function(){
+      res.send(garden)
+    })
+  }// else just update object and don't save
   else{
-    garden[key] = plant;
+    for(var prop in plant){
+      if(plant.hasOwnProperty(prop))
+         garden[key][prop] = plant[prop]
+    }
     res.send(garden);
   }
-  
 });
 
 app.get('/', function(req,res){
